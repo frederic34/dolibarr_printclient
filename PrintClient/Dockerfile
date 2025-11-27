@@ -1,10 +1,10 @@
 # Étape 1 : Build de l'application
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["PrintServer.csproj", "./"]
-RUN dotnet restore "PrintServer.csproj"
+COPY ["PrintClient.csproj", "./"]
+RUN dotnet restore "PrintClient.csproj"
 COPY . .
-RUN dotnet publish "PrintServer.csproj" -c Release -o /app/publish
+RUN dotnet publish "PrintClient.csproj" -c Release -o /app/publish
 
 # Étape 2 : Création de l'image finale (Runtime)
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
@@ -19,4 +19,4 @@ RUN apt-get update && \
 # -----------------------
 
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "PrintServer.dll"]
+ENTRYPOINT ["dotnet", "PrintClient.dll"]

@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   print-client:
-    build: ./PrintServer
+    build: ./PrintClient
     container_name: print_client_app
     restart: unless-stopped
     # On monte le socket CUPS de l'hôte vers le conteneur.
