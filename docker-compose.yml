@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  print-client:
+    build: ./PrintServer
+    container_name: print_client_app
+    restart: unless-stopped
+    # On monte le socket CUPS de l'hôte vers le conteneur.
+    # C'est ce qui permet au 'lp' du conteneur de parler à l'imprimante de l'hôte.
+    volumes:
+      - /var/run/cups/cups.sock:/var/run/cups/cups.sock
+      # Optionnel : Dossier de config pour persister les logs ou fichiers temp
+      - ./temp_data:/app/temp
+    environment:
+      - TZ=Europe/Paris
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
