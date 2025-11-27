@@ -46,6 +46,7 @@ namespace PrintClient
 
             // (Optionnel) Si votre serveur a besoin d'un User-Agent spécifique
             httpClient.DefaultRequestHeaders.Add("User-Agent", "PrintClient v1.0");
+            httpClient.DefaultRequestHeaders.Add("DOLAPIKEY", "GxIr1My2omME424S55JvGy1p3fnI6TCz");
 
             return httpClient;
         }
@@ -83,7 +84,7 @@ namespace PrintClient
             Console.WriteLine("Vérification des tâches...");
 
             // Note: Ceci est un exemple, ajustez selon votre API réelle
-            var tasks = await client.GetFromJsonAsync<List<PrintTask>>(ApiUrl + "/printjobapi/printjobs?DOLAPIKEY=GxIr1My2omME424S55JvGy1p3fnI6TCz&sqlfilters=status%3A%3D%3A0");
+            var tasks = await client.GetFromJsonAsync<List<PrintTask>>(ApiUrl + "/printjobapi/printjobs?sqlfilters=status%3A%3D%3A0");
 
             // POUR LE TEST : On simule une tâche
             // var tasks = new List<PrintTask>();
@@ -99,7 +100,7 @@ namespace PrintClient
                 // 3. Télécharger le fichier
                 string localPath = Path.Combine(TempFolder, Path.GetFileName(task.FileName));
                 Console.WriteLine(localPath);
-                var url = ApiUrl + "/documents/download?DOLAPIKEY=GxIr1My2omME424S55JvGy1p3fnI6TCz&original_file=" + task.FileName + "&modulepart=" + task.Modulepart;
+                var url = ApiUrl + "/documents/download?original_file=" + task.FileName + "&modulepart=" + task.Modulepart;
                 await DownloadFile(url, localPath);
 
                 // 4. Envoyer à l'imprimante
@@ -180,7 +181,7 @@ namespace PrintClient
         {
             Console.WriteLine($"Confirmation de la tâche {taskId} au serveur...");
             // Exemple d'appel POST/PUT pour mettre à jour le statut
-            await client.PutAsync($"{ApiUrl}/printjobapi/printjobs/{taskId}?DOLAPIKEY=GxIr1My2omME424S55JvGy1p3fnI6TCz&status=1", null);
+            await client.PutAsync($"{ApiUrl}/printjobapi/printjobs/{taskId}?status=1", null);
         }
     }
 }
