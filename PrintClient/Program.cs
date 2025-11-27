@@ -15,7 +15,7 @@ namespace PrintClient
         public int Status { get; set; }
     }
 
-    public class Download
+    public class DolibarrDownload
     {
         public string FileName { get; set; }
         public string ContentType { get; set; }
@@ -121,7 +121,7 @@ namespace PrintClient
         {
             Console.WriteLine($"Téléchargement de {url}...");
             // var data = await client.GetByteArrayAsync(url);
-            var download = await client.GetFromJsonAsync<Download>(url);
+            var download = await client.GetFromJsonAsync<DolibarrDownload>(url);
             // Console.WriteLine(download.Content);
             byte[] data = Convert.FromBase64String(download.Content);
             await File.WriteAllBytesAsync(outputPath, data);
