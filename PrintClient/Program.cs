@@ -71,9 +71,9 @@ namespace PrintClient
                     Console.WriteLine($"Erreur générale : {ex.Message}");
                 }
 
-                // Attendre 10 secondes avant la prochaine vérification
+                // Attendre 30 secondes avant la prochaine vérification
                 Console.WriteLine("Attente des prochaines tâches...");
-                await Task.Delay(10000);
+                await Task.Delay(30000);
             }
         }
 
@@ -85,11 +85,6 @@ namespace PrintClient
 
             // Note: Ceci est un exemple, ajustez selon votre API réelle
             var tasks = await client.GetFromJsonAsync<List<PrintTask>>(ApiUrl + "/printjobapi/printjobs?sqlfilters=status%3A%3D%3A0");
-
-            // POUR LE TEST : On simule une tâche
-            // var tasks = new List<PrintTask>();
-            // Décommentez la ligne ci-dessous pour tester avec une vraie API
-            // tasks = await client.GetFromJsonAsync<List<PrintTask>>($"{ApiUrl}/pending");
 
             if (tasks == null || tasks.Count == 0) return;
 
@@ -110,6 +105,13 @@ namespace PrintClient
                 {
                     // 5. Confirmer au serveur que c'est fait
                     await ConfirmTaskComplete(task.Id);
+
+                    // Nettoyage
+                    if (File.Exists(localPath)) File.Delete(localPath);
+                }
+                else
+                {
+                    await ConfirmTaskInError(task.Id);
 
                     // Nettoyage
                     if (File.Exists(localPath)) File.Delete(localPath);
@@ -182,6 +184,12 @@ namespace PrintClient
             Console.WriteLine($"Confirmation de la tâche {taskId} au serveur...");
             // Exemple d'appel POST/PUT pour mettre à jour le statut
             await client.PutAsync($"{ApiUrl}/printjobapi/printjobs/{taskId}?status=1", null);
+        }
+        static async Task ConfirmTaskInError(int taskId)
+        {
+            Console.WriteLine($"Confirmation d'une erreur sur la tâche {taskId} au serveur...");
+            // Exemple d'appel POST/PUT pour mettre à jour le statut
+            await client.PutAsync($"{ApiUrl}/printjobapi/printjobs/{taskId}?status=99", null);
         }
     }
 }
