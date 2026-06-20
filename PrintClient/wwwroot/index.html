@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print Server</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         :root {
             --primary: #2563eb;
@@ -24,7 +25,15 @@
             padding: 2rem 1rem;
         }
         .container { max-width: 640px; margin: 0 auto; }
-        h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; }
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .doli-logo { height: 28px; width: auto; display: block; }
+        .h1-sep { width: 1px; height: 24px; background: var(--border); }
+        .h1-label { font-size: 1.1rem; font-weight: 700; color: var(--text); }
         h2 {
             font-size: 0.7rem;
             font-weight: 600;
@@ -128,7 +137,11 @@
 </head>
 <body>
 <div class="container">
-    <h1>Print Server</h1>
+    <h1>
+        <img src="/dolibarr_logo.svg" class="doli-logo" alt="Dolibarr">
+        <span class="h1-sep"></span>
+        <span class="h1-label">Print Server</span>
+    </h1>
 
     <div class="card">
         <h2>Statut</h2>

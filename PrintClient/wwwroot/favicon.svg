@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    @keyframes emerge {
+      0%, 10% { transform: translateY(0px); }
+      65%     { transform: translateY(9px); }
+      85%     { transform: translateY(9px); }
+      100%    { transform: translateY(0px); }
+    }
+    @keyframes glow {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.15; }
+    }
+    .paper { animation: emerge 2.2s ease-in-out infinite; }
+    .led   { animation: glow 2.2s ease-in-out infinite; }
+  </style>
+
+  <!-- Paper animating out from output slot -->
+  <g class="paper">
+    <rect x="10" y="14" width="12" height="14" rx="1" fill="white"/>
+    <line x1="12" y1="18" x2="20" y2="18" stroke="#c8d0e0" stroke-width="1"/>
+    <line x1="12" y1="20" x2="20" y2="20" stroke="#c8d0e0" stroke-width="1"/>
+    <line x1="12" y1="22" x2="16" y2="22" stroke="#c8d0e0" stroke-width="1"/>
+  </g>
+
+  <!-- Input paper stack -->
+  <rect x="13" y="3" width="6" height="8" rx="1" fill="white" opacity="0.55"/>
+  <rect x="12" y="4" width="8" height="8" rx="1" fill="white" opacity="0.85"/>
+
+  <!-- Printer body (drawn over paper so paper is hidden until it exits) -->
+  <rect x="2" y="10" width="28" height="13" rx="3" fill="#263c5c"/>
+
+  <!-- Input slot -->
+  <rect x="9" y="10" width="14" height="2.5" rx="1" fill="#1a2a40"/>
+
+  <!-- Output slot -->
+  <rect x="9" y="20.5" width="14" height="2.5" rx="1" fill="#1a2a40"/>
+
+  <!-- LED -->
+  <circle class="led" cx="24.5" cy="16" r="2" fill="#007b8c"/>
+
+  <!-- Grip button -->
+  <rect x="4" y="15" width="4" height="2.5" rx="0.8" fill="#1a2a40" opacity="0.55"/>
+</svg>
