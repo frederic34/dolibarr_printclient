@@ -7,7 +7,7 @@ COPY . .
 RUN dotnet publish "PrintClient.csproj" -c Release -o /app/publish
 
 # Étape 2 : Création de l'image finale (Runtime)
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
 # --- PARTIE CRITIQUE ---

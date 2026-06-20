@@ -7,6 +7,8 @@ services:
     restart: unless-stopped
     # On monte le socket CUPS de l'hôte vers le conteneur.
     # C'est ce qui permet au 'lp' du conteneur de parler à l'imprimante de l'hôte.
+    ports:
+      - "5000:8080"
     volumes:
       - /var/run/cups/cups.sock:/var/run/cups/cups.sock
       # Optionnel : Dossier de config pour persister les logs ou fichiers temp
