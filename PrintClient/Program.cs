@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using PrintClient;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,37 @@ app.MapPost("/api/poll", (PrintBackgroundService svc) =>
 {
     svc.TriggerImmediatePoll();
     return Results.Ok();
+});
+
+app.MapGet("/api/printers", () =>
+{
+    try
+    {
+        var info = new ProcessStartInfo
+        {
+            FileName = "lpstat",
+            Arguments = "-a",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using var p = Process.Start(info)!;
+        var output = p.StandardOutput.ReadToEnd();
+        p.WaitForExit();
+
+        var printers = output
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Split(' ')[0])
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToList();
+
+        return Results.Ok(printers);
+    }
+    catch
+    {
+        return Results.Ok(Array.Empty<string>());
+    }
 });
 
 app.Run();

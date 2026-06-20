@@ -103,6 +103,9 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
         }
+        .input-row { display: flex; gap: 0.5rem; align-items: center; }
+        .input-row input { flex: 1; }
+        .btn-icon { padding: 0.5rem 0.65rem; font-size: 1rem; line-height: 1; }
         .row { display: flex; gap: 0.75rem; align-items: center; margin-top: 0.25rem; }
         .btn {
             display: inline-flex;
@@ -179,7 +182,11 @@
             </div>
             <div class="field">
                 <label for="printerName">Nom imprimante CUPS</label>
-                <input id="printerName" type="text" placeholder="AL-C2800" required>
+                <div class="input-row">
+                    <input id="printerName" type="text" placeholder="AL-C2800" required list="printerList">
+                    <button type="button" class="btn btn-ghost btn-icon" onclick="loadPrinters()" title="Actualiser la liste">&#8635;</button>
+                </div>
+                <datalist id="printerList"></datalist>
             </div>
             <div class="field">
                 <label for="pollingInterval">Intervalle de sondage (secondes)</label>
@@ -246,7 +253,17 @@ async function pollNow() {
     await fetch('/api/poll', { method: 'POST' });
 }
 
+async function loadPrinters() {
+    try {
+        const res = await fetch('/api/printers');
+        const printers = await res.json();
+        const dl = document.getElementById('printerList');
+        dl.innerHTML = printers.map(name => `<option value="${name}">`).join('');
+    } catch {}
+}
+
 loadConfig();
+loadPrinters();
 refreshStatus();
 setInterval(refreshStatus, 5000);
 </script>
