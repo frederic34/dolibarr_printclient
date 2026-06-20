@@ -17,7 +17,7 @@ Dolibarr (API REST)  →  Print Server  →  CUPS  →  Imprimante physique
 
 - Docker et Docker Compose
 - CUPS installé sur la machine hôte avec l'imprimante configurée
-- Module Dolibarr `printjobapi` installé et actif
+- Module Dolibarr [printjob](https://github.com/frederic34/dolibarr_module_printjob) installé et actif
 
 ## Déploiement
 
