@@ -37,6 +37,33 @@ app.MapPost("/api/poll", (PrintBackgroundService svc) =>
     return Results.Ok();
 });
 
+app.MapGet("/api/jobs", async (ConfigService cfg) =>
+{
+    var config = cfg.Current;
+    if (string.IsNullOrWhiteSpace(config.ApiUrl) || string.IsNullOrWhiteSpace(config.ApiKey))
+        return Results.Ok(Array.Empty<PrintTask>());
+
+    try
+    {
+        using var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        };
+        using var http = new HttpClient(handler);
+        http.DefaultRequestHeaders.Add("DOLAPIKEY", config.ApiKey);
+        http.DefaultRequestHeaders.Add("Accept", "application/json");
+
+        var jobs = await http.GetFromJsonAsync<List<PrintTask>>(
+            config.ApiUrl + "/printjobapi/printjobs?sqlfilters=status%3A%3D%3A0");
+
+        return Results.Ok(jobs ?? []);
+    }
+    catch
+    {
+        return Results.Ok(Array.Empty<PrintTask>());
+    }
+});
+
 app.MapGet("/api/printers", () =>
 {
     try

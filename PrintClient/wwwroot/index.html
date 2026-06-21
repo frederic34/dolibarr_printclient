@@ -87,6 +87,25 @@
             margin-top: 0.5rem;
             min-height: 1.2em;
         }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+        .card-header h2 { margin-bottom: 0; }
+        .count-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+            border-radius: 999px;
+            padding: 0.15rem 0.55rem;
+            display: none;
+        }
+        .count-badge.visible { display: inline-block; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        th { text-align: left; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+             letter-spacing: 0.06em; color: var(--muted); padding: 0 0 0.6rem; border-bottom: 1px solid var(--border); }
+        td { padding: 0.6rem 0 0.6rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        .td-file { font-family: monospace; font-size: 0.8rem; color: var(--text); word-break: break-all; }
+        .empty-queue { font-size: 0.875rem; color: var(--muted); text-align: center; padding: 1rem 0; }
         form { display: flex; flex-direction: column; gap: 1rem; }
         .field { display: flex; flex-direction: column; gap: 0.35rem; }
         .field label { font-size: 0.875rem; font-weight: 500; }
@@ -167,6 +186,16 @@
             </div>
         </div>
         <div id="lastMsg"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>File d'impression</h2>
+            <span id="jobCount" class="count-badge">0</span>
+        </div>
+        <div id="jobsContainer">
+            <div class="empty-queue">File vide</div>
+        </div>
     </div>
 
     <div class="card">
@@ -253,6 +282,43 @@ async function pollNow() {
     await fetch('/api/poll', { method: 'POST' });
 }
 
+async function refreshJobs() {
+    try {
+        const res = await fetch('/api/jobs');
+        const jobs = await res.json();
+        const container = document.getElementById('jobsContainer');
+        const badge = document.getElementById('jobCount');
+
+        if (!jobs || jobs.length === 0) {
+            container.innerHTML = '<div class="empty-queue">File vide</div>';
+            badge.classList.remove('visible');
+            return;
+        }
+
+        badge.textContent = jobs.length;
+        badge.classList.add('visible');
+
+        container.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:3rem">ID</th>
+                        <th>Fichier</th>
+                        <th style="width:5rem">Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${jobs.map(j => `
+                    <tr>
+                        <td>#${j.id}</td>
+                        <td class="td-file">${j.fileName ?? '—'}</td>
+                        <td>${j.modulepart ?? '—'}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`;
+    } catch {}
+}
+
 async function loadPrinters() {
     try {
         const res = await fetch('/api/printers');
@@ -265,7 +331,8 @@ async function loadPrinters() {
 loadConfig();
 loadPrinters();
 refreshStatus();
-setInterval(refreshStatus, 5000);
+refreshJobs();
+setInterval(() => { refreshStatus(); refreshJobs(); }, 5000);
 </script>
 </body>
 </html>
