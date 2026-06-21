@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using PrintClient;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,34 +64,29 @@ app.MapGet("/api/jobs", async (ConfigService cfg) =>
 });
 
 app.MapGet("/api/printers", () =>
+    Results.Ok(PrinterDiscovery.CollectBasic()));
+
+app.MapPost("/api/printers/sync", async (ConfigService cfg) =>
 {
-    try
+    var printers = PrinterDiscovery.CollectFull();
+
+    var config = cfg.Current;
+    if (!string.IsNullOrWhiteSpace(config.ApiUrl) && !string.IsNullOrWhiteSpace(config.ApiKey))
     {
-        var info = new ProcessStartInfo
+        try
         {
-            FileName = "lpstat",
-            Arguments = "-a",
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-        using var p = Process.Start(info)!;
-        var output = p.StandardOutput.ReadToEnd();
-        p.WaitForExit();
-
-        var printers = output
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Split(' ')[0])
-            .Where(name => !string.IsNullOrWhiteSpace(name))
-            .ToList();
-
-        return Results.Ok(printers);
+            using var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            };
+            using var http = new HttpClient(handler);
+            http.DefaultRequestHeaders.Add("DOLAPIKEY", config.ApiKey);
+            await http.PutAsJsonAsync($"{config.ApiUrl}/printjobapi/printers", printers);
+        }
+        catch { /* Dolibarr pas encore disponible ou endpoint absent */ }
     }
-    catch
-    {
-        return Results.Ok(Array.Empty<string>());
-    }
+
+    return Results.Ok(printers);
 });
 
 app.Run();
