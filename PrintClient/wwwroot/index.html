@@ -82,6 +82,13 @@
         td { padding: 0.55rem 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         .td-file { font-family: monospace; font-size: 0.8rem; word-break: break-all; }
+        .btn-cancel {
+            background: none; border: none; cursor: pointer;
+            color: var(--muted); font-size: 1rem; line-height: 1;
+            padding: 0.2rem 0.4rem; border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .btn-cancel:hover { color: var(--error); background: #fee2e2; }
         .td-name { font-weight: 600; font-size: 0.875rem; }
         .empty-table { font-size: 0.875rem; color: var(--muted); text-align: center; padding: 1rem 0; }
 
@@ -229,6 +236,25 @@ function acceptingBadge(p) {
         : `<span class="badge err">Refuse</span>`;
 }
 
+async function cancelJob(id) {
+    if (!confirm(`Annuler la tâche #${id} ?`)) return;
+    const row = document.getElementById(`job-${id}`);
+    if (row) row.style.opacity = '0.4';
+    try {
+        const res = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            if (row) row.remove();
+            await refreshJobs();
+        } else {
+            if (row) row.style.opacity = '';
+            alert(`Erreur lors de l'annulation (${res.status})`);
+        }
+    } catch {
+        if (row) row.style.opacity = '';
+        alert('Erreur réseau');
+    }
+}
+
 async function loadPrinters() {
     try {
         const res = await fetch('/api/printers');
@@ -331,12 +357,14 @@ async function refreshJobs() {
                     <th style="width:3rem">ID</th>
                     <th>Fichier</th>
                     <th style="width:5rem">Module</th>
+                    <th style="width:2rem"></th>
                 </tr></thead>
                 <tbody>${jobs.map(j => `
-                <tr>
+                <tr id="job-${j.id}">
                     <td>#${j.id}</td>
                     <td class="td-file">${j.fileName ?? '—'}</td>
                     <td>${j.modulepart ?? '—'}</td>
+                    <td><button class="btn-cancel" onclick="cancelJob(${j.id})" title="Annuler">&#x2715;</button></td>
                 </tr>`).join('')}</tbody>
             </table>`;
     } catch {}

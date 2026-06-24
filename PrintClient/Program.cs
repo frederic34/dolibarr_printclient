@@ -63,6 +63,30 @@ app.MapGet("/api/jobs", async (ConfigService cfg) =>
     }
 });
 
+app.MapDelete("/api/jobs/{id:int}", async (int id, ConfigService cfg) =>
+{
+    var config = cfg.Current;
+    if (string.IsNullOrWhiteSpace(config.ApiUrl) || string.IsNullOrWhiteSpace(config.ApiKey))
+        return Results.BadRequest();
+
+    try
+    {
+        using var handler = new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        };
+        using var http = new HttpClient(handler);
+        http.DefaultRequestHeaders.Add("DOLAPIKEY", config.ApiKey);
+
+        var response = await http.DeleteAsync($"{config.ApiUrl}/printjobapi/printjobs/{id}");
+        return response.IsSuccessStatusCode ? Results.Ok() : Results.StatusCode((int)response.StatusCode);
+    }
+    catch
+    {
+        return Results.StatusCode(502);
+    }
+});
+
 app.MapGet("/api/printers", () =>
     Results.Ok(PrinterDiscovery.CollectBasic()));
 
